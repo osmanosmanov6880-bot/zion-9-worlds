@@ -12,7 +12,7 @@ permissions:
   pages: write
   id-token: write
 concurrency:
-  group: github-pages
+  group: github-pages-${{ github.run_id }}
   cancel-in-progress: true
 jobs:
   deploy:
@@ -51,6 +51,7 @@ jobs:
           cat /tmp/zion-static-server.log
           exit 1
       - name: Browser smoke tests — desktop, mobile, WebGL, RU/EN and win state
+        timeout-minutes: 3
         run: |
           set -o pipefail
           node tools/browser-smoke.mjs | tee /tmp/zion-browser-report.json
