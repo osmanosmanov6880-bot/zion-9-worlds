@@ -26,6 +26,16 @@ try {
   assert.equal(home.status(), 200, "Homepage must respond with HTTP 200");
   await page.locator(".z9-language-btn[data-language='en']").waitFor();
   assert.match(await page.locator(".featured-episode").innerText(), /THE SHADE PROTOCOL/i);
+  const worldRoutes = [];
+  for (let n = 20; n <= 30; n++) {
+    const id = "ZION-" + String(n).padStart(3, "0");
+    const route = n === 30 ? "/queue/ZION-030/index.html" : "/queue/" + id + "/index.html";
+    const response = await context.request.get(base + route);
+    assert.equal(response.status(), 200, id + " must respond with HTTP 200");
+    worldRoutes.push(id);
+  }
+  const structured = await context.request.get(base + "/episodes/ZION-030.json");
+  assert.equal(structured.status(), 200, "Structured episode data must be public");
   await page.screenshot({ path: "test-results/home-en.png", fullPage: true });
 
   await page.locator(".z9-language-btn[data-language='ru']").click();
@@ -34,13 +44,13 @@ try {
   await page.screenshot({ path: "test-results/home-ru.png", fullPage: true });
   await page.locator(".z9-language-btn[data-language='en']").click();
   await page.getByText("THE SHADE PROTOCOL", { exact: true }).first().waitFor();
-  results.home = { http: home.status(), localeToggle: "EN<->RU", screenshots: 2 };
+  results.home = { http: home.status(), localeToggle: "EN<->RU", publicWorldRoutes: worldRoutes, episodeJsonHttp: structured.status(), screenshots: 2 };
 
   const world = await context.newPage();
   world.on("pageerror", error => errors.push(error.message));
   const worldResponse = await world.goto(base + "/queue/ZION-030/index.html?test=1", { waitUntil: "networkidle", timeout: 45000 });
   assert.equal(worldResponse.status(), 200, "3D world must respond with HTTP 200");
-  await world.waitForFunction(() => window.__ZION9_TEST__ && document.querySelector("#scene canvas"), { timeout: 30000 });
+  await world.waitForFunction(() => window.__ZION9_TEST__ && document.querySelector("#scene canvas"), undefined, { timeout: 30000 });
   await world.waitForTimeout(900);
   const renderer = await world.evaluate(() => ({
     context: !!document.querySelector("#scene canvas")?.getContext("webgl2"),
