@@ -245,7 +245,7 @@
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
     const nodes = [];
     while (walker.nextNode()) nodes.push(walker.currentNode);
-    nodes.forEach(node => { node.nodeValue = translateValue(node.nodeValue); });
+    nodes.forEach(node => { const oldValue = node.nodeValue; const newValue = translateValue(oldValue); if (newValue !== oldValue) node.nodeValue = newValue; });
     const elements = [root, ...root.querySelectorAll("*")];
     elements.forEach(el => {
       ["aria-label", "title", "alt"].forEach(attr => {
@@ -300,10 +300,10 @@
     if (!records.length) return;
     records.forEach(record => {
       record.addedNodes && record.addedNodes.forEach(node => {
-        if (node.nodeType === Node.TEXT_NODE) node.nodeValue = translateValue(node.nodeValue);
+        if (node.nodeType === Node.TEXT_NODE) { const oldValue = node.nodeValue; const newValue = translateValue(oldValue); if (newValue !== oldValue) node.nodeValue = newValue; }
         else if (node.nodeType === Node.ELEMENT_NODE) translateTree(node);
       });
-      if (record.type === "characterData") record.target.nodeValue = translateValue(record.target.nodeValue);
+      if (record.type === "characterData") { const oldValue = record.target.nodeValue; const newValue = translateValue(oldValue); if (newValue !== oldValue) record.target.nodeValue = newValue; }
     });
   });
   observer.observe(document.body, {subtree:true,childList:true,characterData:true});
