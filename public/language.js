@@ -595,8 +595,9 @@
         if (node.nodeType === Node.TEXT_NODE) { const oldValue = node.nodeValue; const newValue = translateValue(oldValue); if (newValue !== oldValue) node.nodeValue = newValue; }
         else if (node.nodeType === Node.ELEMENT_NODE) translateTree(node);
       });
-      if (record.type === "characterData") { const oldValue = record.target.nodeValue; const newValue = translateValue(oldValue); if (newValue !== oldValue) record.target.nodeValue = newValue; }
     });
   });
-  observer.observe(document.body, {subtree:true,childList:true,characterData:true});
+  // Observe newly inserted UI nodes only. Watching characterData also observes
+  // the translations performed above and needlessly reprocesses the whole update.
+  observer.observe(document.body, {subtree:true,childList:true});
 })();
