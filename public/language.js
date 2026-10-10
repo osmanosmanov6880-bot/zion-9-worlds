@@ -565,11 +565,22 @@
     if (label) label.textContent = language === "ru" ? "ЯЗЫК" : "LANGUAGE";
     document.querySelectorAll(".z9-language-btn").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.language === language)));
   }
+  function applySplitDossierHeading() {
+    const heading = document.querySelector(".hero h1");
+    if (!heading || !heading.querySelector("em")) return;
+    const emphasis = heading.querySelector("em");
+    const firstText = Array.from(heading.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.nodeValue.trim());
+    if (!firstText) return;
+    // Keep this intentionally split design heading stable across DOM-based translation.
+    firstText.nodeValue = language === "ru" ? "ТЕНЕВОЙ" : "THE SHADE";
+    emphasis.textContent = language === "ru" ? "ПРОТОКОЛ" : "PROTOCOL";
+  }
   function setLanguage(next) {
     language = next === "ru" ? "ru" : "en";
     try { localStorage.setItem(STORAGE_KEY, language); } catch (_) {}
     document.documentElement.lang = language;
     translateTree(document.body);
+    applySplitDossierHeading();
     if (document.title) document.title = translateValue(document.title);
     document.querySelectorAll('meta[name="description"]').forEach(meta => meta.content = translateValue(meta.content));
     updateSwitcher();
