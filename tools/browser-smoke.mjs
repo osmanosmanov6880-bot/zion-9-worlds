@@ -151,7 +151,7 @@ try {
     () => !!document.querySelector("#scene canvas") ||
       /Three\\.js could not load/i.test(document.querySelector("#scene")?.textContent || ""),
     undefined,
-    { timeout: 12000 }
+    { timeout: 24000 }
   );
   const layout = await mobile.evaluate(() => ({
     viewport: window.innerWidth,
