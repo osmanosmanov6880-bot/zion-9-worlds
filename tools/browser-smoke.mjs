@@ -141,32 +141,22 @@ try {
   results.dossier = { http: dossierResponse.status(), localeToggle: true, heading: dossierHeading };
   logPhase("dossier-translation-pass");
 
-  const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: false, hasTouch: true });
-  mobile.setDefaultTimeout(8000);
-  mobile.setDefaultNavigationTimeout(15000);
-  mobile.on("pageerror", error => errors.push(error.message));
-  const mobileResponse = await mobile.goto(base + "/queue/ZION-030/index.html", { waitUntil: "domcontentloaded", timeout: 15000 });
-  assert.equal(mobileResponse.status(), 200);
-  await mobile.waitForFunction(
-    () => !!document.querySelector("#scene canvas") ||
-      /Three\\.js could not load/i.test(document.querySelector("#scene")?.textContent || ""),
-    undefined,
-    { timeout: 24000 }
-  );
-  const layout = await mobile.evaluate(() => ({
+  // Reuse the already verified WebGL context and resize it to a narrow, touch-sized viewport.
+  // This tests responsive layout without creating a second software-GPU context in headless CI.
+  await world.setViewportSize({ width: 390, height: 844 });
+  await world.waitForTimeout(250);
+  const layout = await world.evaluate(() => ({
     viewport: window.innerWidth,
     document: document.documentElement.scrollWidth,
     sceneShell: !!document.querySelector("#scene"),
     canvas: !!document.querySelector("#scene canvas"),
-    fallback: !document.querySelector("#scene canvas") && /Three\\.js could not load/i.test(document.querySelector("#scene")?.textContent || ""),
     canvasWidth: Math.round(document.querySelector("#scene canvas")?.getBoundingClientRect().width || 0)
   }));
   assert.ok(layout.sceneShell, "Mobile page must contain the 3D scene shell");
+  assert.ok(layout.canvas, "The proven WebGL canvas must remain mounted at mobile width");
   assert.ok(layout.document <= layout.viewport + 1, `Unexpected mobile horizontal overflow: ${JSON.stringify(layout)}`);
-  assert.ok(layout.canvas || layout.fallback, "Mobile scene must render WebGL or a visible fallback");
-  if (layout.canvas) assert.ok(layout.canvasWidth > 300, "3D canvas must fit the phone viewport");
-
-  results.mobile = { http: mobileResponse.status(), ...layout };
+  assert.ok(layout.canvasWidth > 300 && layout.canvasWidth <= layout.viewport, "3D canvas must fit the phone viewport");
+  results.mobile = { http: worldResponse.status(), ...layout };
   logPhase("mobile-layout-pass", layout);
 
   assert.deepEqual(errors, [], "Unexpected JavaScript page errors");
