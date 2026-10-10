@@ -538,6 +538,39 @@
       });
     });
   }
+  function translateTreeAsync(root) {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    const elements = [root, ...root.querySelectorAll("*")];
+    let textIndex = 0;
+    let elementIndex = 0;
+    function frame() {
+      // Keep language switching responsive while the 3D scene is rendering.
+      const textEnd = Math.min(textIndex + 100, nodes.length);
+      while (textIndex < textEnd) {
+        const node = nodes[textIndex++];
+        const oldValue = node.nodeValue;
+        const newValue = translateValue(oldValue);
+        if (newValue !== oldValue) node.nodeValue = newValue;
+      }
+      const elementEnd = Math.min(elementIndex + 200, elements.length);
+      while (elementIndex < elementEnd) {
+        const el = elements[elementIndex++];
+        ["aria-label", "title", "alt"].forEach(attr => {
+          if (el.hasAttribute && el.hasAttribute(attr)) {
+            const oldValue = el.getAttribute(attr);
+            const newValue = translateValue(oldValue);
+            if (newValue !== oldValue) el.setAttribute(attr, newValue);
+          }
+        });
+      }
+      if (textIndex < nodes.length || elementIndex < elements.length) {
+        requestAnimationFrame(frame);
+      }
+    }
+    requestAnimationFrame(frame);
+  }
   function addStyles() {
     const style = document.createElement("style");
     style.textContent = ".z9-language-bar{display:flex;justify-content:flex-end;align-items:center;gap:4px;margin:0 0 12px;font:11px/1.2 system-ui,sans-serif;letter-spacing:.08em}.z9-language-label{color:#8290a6;margin-right:6px;font-size:10px}.z9-language-btn{border:1px solid rgba(255,255,255,.17);border-radius:99px;background:rgba(255,255,255,.025);color:#c2cee0;padding:7px 11px;cursor:pointer;font:600 10px/1 system-ui,sans-serif;letter-spacing:.1em}.z9-language-btn:hover,.z9-language-btn:focus-visible{border-color:#91e7f5;outline:none}.z9-language-btn[aria-pressed=true]{color:#071018;background:#91e7f5;border-color:#91e7f5}";
@@ -579,7 +612,8 @@
     language = next === "ru" ? "ru" : "en";
     try { localStorage.setItem(STORAGE_KEY, language); } catch (_) {}
     document.documentElement.lang = language;
-    translateTree(document.body);
+    // Schedule text translation in small batches so language changes never freeze a live 3D scene.
+    translateTreeAsync(document.body);
     applySplitDossierHeading();
     if (document.title) document.title = translateValue(document.title);
     document.querySelectorAll('meta[name="description"]').forEach(meta => meta.content = translateValue(meta.content));
