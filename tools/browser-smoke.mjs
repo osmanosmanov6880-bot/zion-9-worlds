@@ -104,8 +104,8 @@ try {
   assert.equal(dossierResponse.status(), 200, "Episode dossier must respond with HTTP 200");
   await dossier.locator(".z9-language-btn[data-language='ru']").click();
   await dossier.waitForFunction(() => document.documentElement.lang === "ru");
-  const dossierHeading = (await dossier.locator(".hero h1").innerText()).replace(/\\s+/g, " ").trim();
-  assert.match(dossierHeading, /ТЕНЕВОЙ\\s+ПРОТОКОЛ/i, "Dossier H1 should be translated even when split across markup: " + dossierHeading);
+  const dossierHeading = (await dossier.locator(".hero h1").innerText()).replace(/\s+/g, " ").trim();
+  assert.match(dossierHeading, /ТЕНЕВОЙ ПРОТОКОЛ/i, "Dossier H1 should be translated even when split across markup: " + dossierHeading);
   await dossier.screenshot({ path: "test-results/dossier-ru.png", fullPage: true });
   results.dossier = { http: dossierResponse.status(), localeToggle: true, heading: dossierHeading };
 
