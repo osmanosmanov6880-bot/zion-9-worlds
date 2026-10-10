@@ -220,7 +220,7 @@ function playMotif(){
   [c,g,e].forEach((f,i)=>{const osc=audioContext.createOscillator(),gain=audioContext.createGain();osc.type="sine";osc.frequency.value=f;gain.gain.setValueAtTime(.0001,now+i*.22);gain.gain.exponentialRampToValueAtTime(.12,now+i*.22+.035);gain.gain.exponentialRampToValueAtTime(.0001,now+i*.22+.19);osc.connect(gain);gain.connect(audioContext.destination);osc.start(now+i*.22);osc.stop(now+i*.22+.2);});
  }catch(err){say("Audio unavailable","Allow browser audio and try again.");}
 }
-function resize(){if(!renderer||!camera)return;const w=Math.max(1,root.clientWidth),h=Math.max(1,root.clientHeight);renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+function resize(){if(!renderer||!camera)return;const w=Math.max(1,root.clientWidth),h=Math.max(1,root.clientHeight);renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();}
 function animate(time){
  if(!renderer)return;frameCounter++;const t=time*.001;
  hotRings.forEach((r,i)=>{r.scale.setScalar(1+Math.sin(t*2+i)*.055);});
