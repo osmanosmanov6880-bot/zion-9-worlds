@@ -17,7 +17,7 @@ main{width:min(1240px,100%);margin:auto;padding:22px clamp(14px,3vw,32px) 44px}h
 </style></head>
 <body><main>
 <header><div class="brand"><span class="orb" aria-hidden="true"></span>ZION-9 / MONOLITH · ZION-030</div><a href="../../index.html">← ALL WORLDS</a></header>
-<section class="hero"><div><div class="eyebrow">Athens · Climate adaptation / interactive field lab</div><h1>THE SHADE PROTOCOL</h1><p>Three interventions. Three heat hotspots. Turn a sun-baked city block into a cooler public place — one deliberate placement at a time.</p></div><div class="live-ref"><small>Athens surface reference</small><strong>60° → 30°C</strong><span>sun / tree shade · 2025</span></div></section>
+<section class="hero"><div><div class="eyebrow">Athens · Climate adaptation / interactive field lab</div><h1>THE SHADE PROTOCOL</h1><p>Three interventions. Three heat hotspots. Turn a sun-baked city block into a cooler public place — one deliberate placement at a time.</p></div><div class="live-ref"><small>Athens surface reference</small><strong>60°C → 30°C</strong><span>sun / tree shade · 2025</span></div></section>
 <section class="layout">
 <div class="stage"><div id="scene" class="scene" role="img" aria-label="Procedurally generated 3D city block heat map. Select a cooling module and tap the ground to place it."></div><div class="stage-top"><span class="pill hot">● HEAT RISK MAP · SIMULATION</span><span class="pill" id="placedPill">NODES 0 / 3</span></div><div class="stage-bottom"><span class="pill" id="sceneHint">SELECT MODULE → TAP AN EMPTY TILE</span><span class="pill">3D / WEBXR</span></div></div>
 <aside class="panel"><h2>Deploy a cooling intervention</h2><p class="sub">Choose a module, then tap an empty tile in the city. Cover all three marked hotspots before your deployment budget runs out.</p>
@@ -42,7 +42,7 @@ const root=document.getElementById("scene"), statusTitle=document.getElementById
 const placedPill=document.getElementById("placedPill"),scoreEl=document.getElementById("score"),leftEl=document.getElementById("left"),meter=[...document.querySelectorAll("#meter i")];
 const moduleButtons=[...document.querySelectorAll(".module")],arButton=document.getElementById("ar");
 const HOT=[{x:-4,z:-3},{x:2,z:2},{x:4,z:-2}];
-const GRID=7;let selected="tree",placed=[],won=false,lost=false,renderer,scene,camera,world,moduleGroup,hotGroup,floor,raycaster,pointer,resizeObserver,audioContext;
+const GRID=7;let selected="tree",placed=[],won=false,lost=false,renderer,scene,camera,world,moduleGroup,hotGroup,floor,raycaster,pointer,resizeObserver,audioContext,normalBackground;
 const occupied=new Set();let hotRings=[];
 const say=(title,text)=>{statusTitle.textContent=title;statusText.textContent=text;};
 function deterministic(x,z){let n=Math.sin(x*127.1+z*311.7+74.7)*43758.5453;return n-Math.floor(n);}
@@ -50,7 +50,7 @@ function material(color,roughness=.78,metalness=.05,emissive=0x000000){return ne
 function addBox(parent,x,y,z,w,h,d,mat){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y+h/2,z);parent.add(m);return m;}
 function key(x,z){return Math.round(x)+","+Math.round(z);}
 function buildCity(){
- scene=new THREE.Scene();scene.background=new THREE.Color(0x080d16);scene.fog=new THREE.Fog(0x080d16,18,34);
+ scene=new THREE.Scene();scene.background=new THREE.Color(0x080d16);normalBackground=scene.background;scene.fog=new THREE.Fog(0x080d16,18,34);
  camera=new THREE.PerspectiveCamera(42,1,.1,100);camera.position.set(11,14,17);camera.lookAt(0,0,0);
  renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:"high-performance"});
  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.7));renderer.setSize(root.clientWidth,root.clientHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;root.appendChild(renderer.domElement);
@@ -127,22 +127,23 @@ function onPlace(event){
  if(occupied.has(k)||placed.some(p=>p.key===k)){say("Tile unavailable","Choose an empty tile. Buildings and existing interventions cannot be replaced.");return;}
  occupied.add(k);const module=makeModule(selected,x,z);moduleGroup.add(module);placed.push({x,z,key:k,type:selected});
  const covered=HOT.map(p=>placed.some(m=>Math.hypot(m.x-p.x,m.z-p.z)<=1.35));
- const score=covered.filter(Boolean).length;updateUI(score);
+ const score=covered.filter(Boolean).length;updateUI(covered);
  if(score===3){won=true;say("Mission complete","All three heat hotspots are covered. You built a cooler shared space. Play the C–G–E signature or open the source dossier.");playMotif();}
  else if(placed.length===3){lost=true;say("Thermal pressure remains","Three modules used, but one or more hotspots remain exposed. Reset and try a tighter placement.");}
  else say("Intervention placed",score+" of 3 hotspots covered. "+(3-placed.length)+" modules remain. Target glowing rings.");
 }
-function updateUI(score){
+function updateUI(covered){
+ const score=covered.filter(Boolean).length;
  placedPill.textContent="NODES "+placed.length+" / 3";scoreEl.textContent=String(score).padStart(2,"0")+" / 03";leftEl.textContent=String(Math.max(0,3-placed.length));
  meter.forEach((e,i)=>e.classList.toggle("on",i<score));
- hotRings.forEach((ring,i)=>{ring.material.color.set( score>i?0x72e6b1:0xff805e);ring.material.opacity=score>i?.75:.95;});
+ hotRings.forEach((ring,i)=>{ring.material.color.set(covered[i]?0x72e6b1:0xff805e);ring.material.opacity=covered[i]?.75:.95;});
 }
 function reset(){
  placed=[];won=false;lost=false;occupied.clear();
  for(let x=-7;x<=7;x++)for(let z=-7;z<=7;z++){if(Math.abs(x)<=2&&Math.abs(z)<=2)continue;const h=deterministic(x,z);if(h>=.49&&Math.abs(x)<=6&&Math.abs(z)<=6&&!HOT.some(p=>Math.hypot(p.x-x,p.z-z)<1.55))occupied.add(key(x,z));}
  while(moduleGroup&&moduleGroup.children.length){const o=moduleGroup.children.pop();o.traverse?.(n=>{n.geometry?.dispose();if(n.material){if(Array.isArray(n.material))n.material.forEach(m=>m.dispose());else n.material.dispose();}});}
  hotRings.forEach(r=>{r.material.color.set(0xff805e);r.material.opacity=.95;});
- updateUI(0);say("Mission brief","Place cooling infrastructure close to each glowing hotspot. This is an educational simulation, not a live city model.");
+ updateUI([false,false,false]);say("Mission brief","Place cooling infrastructure close to each glowing hotspot. This is an educational simulation, not a live city model.");
 }
 function playMotif(){
  try{
@@ -168,10 +169,10 @@ async function setupAR(){
   arButton.addEventListener("click",async()=>{
    try{
     const session=await navigator.xr.requestSession("immersive-ar",{optionalFeatures:["local-floor","dom-overlay"],domOverlay:{root:document.body}});
-    renderer.xr.enabled=true;renderer.xr.setReferenceSpaceType("local");
+    renderer.xr.enabled=true;renderer.xr.setReferenceSpaceType("local");scene.background=null;scene.fog=null;
     world.position.set(0,-.35,-2.6);world.scale.setScalar(.32);camera.position.set(0,0,0);camera.lookAt(0,0,-1);
     await renderer.xr.setSession(session);
-    session.addEventListener("end",()=>{world.position.set(0,0,0);world.scale.setScalar(1);camera.position.set(11,14,17);camera.lookAt(0,0,0);resize();});
+    session.addEventListener("end",()=>{scene.background=normalBackground;scene.fog=new THREE.Fog(0x080d16,18,34);world.position.set(0,0,0);world.scale.setScalar(1);camera.position.set(11,14,17);camera.lookAt(0,0,0);resize();});
    }catch(err){say("AR could not start","Use the 3D simulation in a compatible browser over HTTPS, then try AR again.");}
   });
  }catch(err){arButton.textContent="◈ AR NOT AVAILABLE";arButton.disabled=true;}
