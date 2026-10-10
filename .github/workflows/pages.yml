@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - "public/**"
+      - "tools/browser-smoke.mjs"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 permissions:
@@ -19,15 +20,49 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      - name: Configure Pages
-        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
-          enablement: true
-      - name: Validate language switcher syntax
-        run: node --check public/language.js
+          node-version: "22"
+      - name: Set up Python for local static server
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: "3.11"
+      - name: Validate JavaScript syntax
+        run: |
+          node --check public/language.js
+          node --check tools/browser-smoke.mjs
+      - name: Install pinned Playwright
+        run: npm install --no-save playwright@1.56.1
+      - name: Install Chromium with SwiftShader prerequisites
+        run: npx playwright install --with-deps chromium
+      - name: Start local static server
+        run: |
+          python3 -m http.server 8000 --directory public > /tmp/zion-static-server.log 2>&1 &
+          echo $! > /tmp/zion-static-server.pid
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent http://127.0.0.1:8000/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/zion-static-server.log
+          exit 1
+      - name: Browser smoke tests — desktop, mobile, WebGL, RU/EN and win state
+        run: node tools/browser-smoke.mjs | tee /tmp/zion-browser-report.json
+      - name: Publish browser proof
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: zion-030-browser-smoke-proof
+          path: |
+            test-results/
+            /tmp/zion-browser-report.json
+            /tmp/zion-static-server.log
+          if-no-files-found: warn
+          retention-days: 30
       - name: Upload static site
         uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b
         with:
