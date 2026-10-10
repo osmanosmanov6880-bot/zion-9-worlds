@@ -85,6 +85,8 @@ try {
   logPhase("webgl-ready", renderer);
 
   await world.bringToFront();
+  // Give adaptive rendering two seconds to settle before sampling steady-state FPS.
+  await world.waitForTimeout(3000);
   const fps = await world.evaluate(async () => {
     const start = performance.now();
     const startFrames = window.__ZION9_TEST__.state().frameCounter;
@@ -94,7 +96,9 @@ try {
     return Math.round(renderedFrames * 1000 / elapsed);
   });
   console.log("Three.js rendered FPS sample: " + fps);
-  assert.ok(fps >= 10, `Three.js rendered FPS sample too low: ${fps}`);
+  const qualityState = await world.evaluate(() => ({ pixelRatio: window.__ZION9_TEST__.state().pixelRatio, adaptiveQualitySteps: window.__ZION9_TEST__.state().adaptiveQualitySteps }));
+  logPhase("adaptive-quality-state", qualityState);
+  assert.ok(fps >= 20, `Three.js rendered FPS sample too low after adaptive quality: ${fps}`);
 
   const worldLocale = await world.evaluate(() => {
     const button = document.querySelector(".z9-language-btn[data-language='ru']");
