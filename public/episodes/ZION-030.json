@@ -1,0 +1,272 @@
+{
+  "episode_id": "ZION-030",
+  "published_date": "2026-10-11",
+  "title": {
+    "en": "THE SHADE PROTOCOL",
+    "ru": "ТЕНЕВОЙ ПРОТОКОЛ"
+  },
+  "city": {
+    "name": "Athens",
+    "country": "Greece",
+    "latitude": 37.989284,
+    "longitude": 23.743921,
+    "location_name": "Argentinis Dimokratias Square — reference pin; not claimed to be the precise sensor point",
+    "map_url": "https://www.google.com/maps?q=37.989284,23.743921"
+  },
+  "pain": {
+    "category": [
+      "climate adaptation",
+      "public health",
+      "accessibility"
+    ],
+    "statement": "Extreme urban heat produces uneven surface thermal exposure and unequal access to cooler public places.",
+    "verified_observation": {
+      "value": "60°C exposed paving vs 30°C under tree shade",
+      "context": "Surface temperature measurements reported for Argentinis Dimokratias Square during summer 2025; not air temperature.",
+      "sources": [
+        "https://eu-mayors.ec.europa.eu/en/Athens-Hits-Refresh-Beating-the-Heat-with-Urban-Cooling-Solutions",
+        "https://netzerocities.eu/2025/09/03/cooling-athens-targeted-urban-interventions-for-a-resilient-city/"
+      ]
+    },
+    "secondary_observation": {
+      "value": "4–6°C surface cooling",
+      "context": "Reported at Agia Irini Square after cool materials and targeted shading.",
+      "source": "https://eu-mayors.ec.europa.eu/en/Athens-Hits-Refresh-Beating-the-Heat-with-Urban-Cooling-Solutions"
+    },
+    "population_context": {
+      "value": 637798,
+      "unit": "residents",
+      "source": "https://www.cityofathens.gr/en/",
+      "warning": "Municipality population context only; not the number of residents harmed by heat."
+    },
+    "programme_targets": {
+      "new_blue_green_infrastructure_m2": 8000,
+      "planned_sites": 6,
+      "target_local_cooling_c": 5,
+      "target_rainwater_retention_percent": 70,
+      "source": "https://www.cityofathens.gr/cooling-havens-3/",
+      "status": "programme targets, not verified completed outcomes"
+    }
+  },
+  "technology": [
+    {
+      "name": "#CoolAthens",
+      "country": "Greece",
+      "status": "live public municipal information service",
+      "url": "https://coolathens.cityofathens.gr/en/",
+      "details": "Municipal heatwave information; cites an algorithm using two decades of historical weather and mortality data and updated temperature/thermal-discomfort maps."
+    },
+    {
+      "name": "Cooling Havens",
+      "country": "Greece",
+      "status": "municipal programme under implementation/planning as described on official site",
+      "url": "https://www.cityofathens.gr/cooling-havens-3/",
+      "details": "Water reuse, rain gardens, blue-green public spaces and IoT environmental monitoring; targets labelled as targets."
+    },
+    {
+      "name": "Athens urban cooling interventions",
+      "country": "Greece",
+      "status": "field results reported for 2025",
+      "url": "https://eu-mayors.ec.europa.eu/en/Athens-Hits-Refresh-Beating-the-Heat-with-Urban-Cooling-Solutions",
+      "details": "Thermal camera readings for shaded streets, cool surfaces, a microforest and a cooling garden."
+    }
+  ],
+  "photo": {
+    "file": "Orange tree in the street in Athens, Greece.jpg",
+    "author": "Philip Mallis",
+    "license": "CC BY-SA 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Orange_tree_in_the_street_in_Athens,_Greece.jpg",
+    "direct_image": "https://commons.wikimedia.org/wiki/Special:FilePath/Orange_tree_in_the_street_in_Athens,_Greece.jpg?width=1200",
+    "note": "Illustrative Athens street-tree image; it is not a photograph of the measured square."
+  },
+  "playable_world": {
+    "url": "https://osmanosmanov6880-bot.github.io/zion-9-worlds/queue/ZION-030/index.html",
+    "mechanics": "Place three interventions on empty tiles near three heat hotspots. Win by covering all hotspots; using all modules without coverage is a loss. Scores are illustrative, not scientific predictions.",
+    "sound_motif": "C4–G4–E4 through Web Audio API",
+    "ar": "WebXR immersive-ar attempted only if browser support is detected; availability varies by device/browser."
+  },
+  "video": {
+    "duration_seconds": 75,
+    "shot_count": 10,
+    "script": [
+      {
+        "time": "00–02",
+        "shot": "Thermal hook",
+        "action": "Macro sunlit pavement; overlay 60°C exposed vs 30°C in shade."
+      },
+      {
+        "time": "02–08",
+        "shot": "Athens arrival",
+        "action": "Wide street shot; ZION-9 enters the frame."
+      },
+      {
+        "time": "08–15",
+        "shot": "The point",
+        "action": "ZION points at the pavement; cyan grid traces a hot zone."
+      },
+      {
+        "time": "15–22",
+        "shot": "Show evidence",
+        "action": "Source card names the 2025 field report and distinguishes surface from air temperature."
+      },
+      {
+        "time": "22–30",
+        "shot": "Existing technology",
+        "action": "Show official heat-risk service and cool public-space examples."
+      },
+      {
+        "time": "30–39",
+        "shot": "World birth",
+        "action": "Procedural Three.js city emerges; heat spots glow."
+      },
+      {
+        "time": "39–49",
+        "shot": "Player solves",
+        "action": "Choose and place a tree, canopy and rain garden."
+      },
+      {
+        "time": "49–58",
+        "shot": "Win",
+        "action": "All hotspots turn green; show clear game victory."
+      },
+      {
+        "time": "58–68",
+        "shot": "Social value",
+        "action": "Show shade, accessible routes and public space without implying the prototype changes real infrastructure."
+      },
+      {
+        "time": "68–75",
+        "shot": "CTA",
+        "action": "Invite viewers to play and share with city planners."
+      }
+    ],
+    "production_budget_eur": {
+      "min": 0,
+      "max": 50,
+      "excludes": [
+        "operator labour",
+        "paid voice/video subscriptions"
+      ],
+      "note": "Target budget, not audited spend."
+    },
+    "platforms": [
+      "TikTok",
+      "Instagram Reels",
+      "YouTube Shorts",
+      "X",
+      "Telegram"
+    ]
+  },
+  "monetization": [
+    {
+      "stream": "B2C",
+      "offer": "World Pass",
+      "price_eur": 4.99,
+      "cadence": "monthly",
+      "platform_candidates": [
+        "Ko-fi",
+        "Lemon Squeezy"
+      ],
+      "status": "not connected",
+      "unit_example": "100 members = €499/month gross before fees/refunds/tax."
+    },
+    {
+      "stream": "B2B",
+      "offer": "City / NGO commissioned impact world",
+      "price_eur_min": 2000,
+      "price_eur_max": 10000,
+      "status": "offer model only",
+      "unit_example": "Illustrative €5,000 contract - €1,500 direct production budget = €3,500 contribution, 70%, before sales/overhead/tax."
+    },
+    {
+      "stream": "Licence",
+      "offer": "ZION-9 World Engine white-label licence",
+      "price_eur_min": 10000,
+      "cadence": "yearly",
+      "status": "requires hardened production engine and contract",
+      "unit_example": "Illustrative €10,000 licence - €2,000 annual support allowance = €8,000 contribution, 80%, before acquisition/tax."
+    }
+  ],
+  "metrics_targets": {
+    "views_24h": 1000,
+    "click_through_rate_percent": 5,
+    "game_completion_percent": 35,
+    "qualified_b2b_leads": 3,
+    "ugc_posts": 5,
+    "shares": 20,
+    "note": "Targets for manual tracking; not measured results. No analytics adapter is connected in this static release."
+  },
+  "evolution": {
+    "score_type": "editorial self-assessment, not analytics",
+    "baseline": "No validated historical 12-axis scorecard was stored for episode 029; previous values are estimates only.",
+    "axes": [
+      [
+        "Lore and mythology",
+        73,
+        80
+      ],
+      [
+        "City and location",
+        60,
+        88
+      ],
+      [
+        "Pain research",
+        58,
+        90
+      ],
+      [
+        "Technology and sources",
+        62,
+        91
+      ],
+      [
+        "Video scenario",
+        60,
+        86
+      ],
+      [
+        "3D world",
+        62,
+        89
+      ],
+      [
+        "Sound",
+        55,
+        85
+      ],
+      [
+        "Virality",
+        65,
+        81
+      ],
+      [
+        "ARG continuity",
+        68,
+        76
+      ],
+      [
+        "Monetization",
+        58,
+        78
+      ],
+      [
+        "Technical quality",
+        62,
+        84
+      ],
+      [
+        "Autonomy",
+        68,
+        70
+      ]
+    ],
+    "measured_outcomes": false
+  },
+  "arg": {
+    "next_episode": "ZION-031",
+    "clue": "THE PLACES THAT STAY COOL AFTER SUNSET.",
+    "next_seed": "BLUE-HOUR-ROUTE-31"
+  },
+  "self_critique": "AR support is browser-dependent and needs physical-device testing. Checkout, analytics, social publishing and cross-device browser test logs are not connected; do not claim production-scale autonomy or paid conversion."
+}
