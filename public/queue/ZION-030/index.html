@@ -52,16 +52,27 @@ function key(x,z){return Math.round(x)+","+Math.round(z);}
 function buildCity(){
  scene=new THREE.Scene();scene.background=new THREE.Color(0x080d16);normalBackground=scene.background;scene.fog=new THREE.Fog(0x080d16,18,34);
  camera=new THREE.PerspectiveCamera(42,1,.1,100);camera.position.set(11,14,17);camera.lookAt(0,0,0);
- renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:"high-performance"});
- renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.7));renderer.setSize(root.clientWidth,root.clientHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;root.appendChild(renderer.domElement);
- scene.add(new THREE.HemisphereLight(0xb6e7ff,0x171723,2.0));
- const keyLight=new THREE.DirectionalLight(0xffd4a4,3.2);keyLight.position.set(-7,13,8);scene.add(keyLight);
- const rim=new THREE.PointLight(0x2e9ed0,18,24);rim.position.set(8,6,-7);scene.add(rim);
+ renderer=new THREE.WebGLRenderer({antialias:false,alpha:true,powerPreference:"high-performance"});
+ renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.35));renderer.setSize(root.clientWidth,root.clientHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.08;root.appendChild(renderer.domElement);
+ scene.add(new THREE.HemisphereLight(0xb6e7ff,0x171723,1.8));
+ const keyLight=new THREE.DirectionalLight(0xffd4a4,2.6);keyLight.position.set(-7,13,8);scene.add(keyLight);
+ const rim=new THREE.PointLight(0x2e9ed0,12,24);rim.position.set(8,6,-7);scene.add(rim);
  world=new THREE.Group();scene.add(world);
  const groundMat=material(0x101a26,.95);floor=new THREE.Mesh(new THREE.PlaneGeometry(16,16),groundMat);floor.rotation.x=-Math.PI/2;floor.position.y=-.04;floor.userData.ground=true;world.add(floor);
  const grid=new THREE.GridHelper(16,16,0x375066,0x263546);grid.position.y=.01;world.add(grid);
  const plaza=material(0x1a2935,.9);addBox(world,0,.01,0,5,.035,5,plaza);
- const concrete=material(0x394550,.82);const shadow=material(0x202c38,.9);const windows=material(0x122c3d,.4,.45,0x082030);
+ // Reuse a handful of instanced draw calls instead of allocating hundreds of separate meshes.
+ const unitBox=new THREE.BoxGeometry(1,1,1);
+ const buildingMat=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.84,metalness:.035});
+ const roofMat=material(0x202c38,.9);
+ const windowsMat=material(0x122c3d,.4,.45,0x082030);
+ const badgeMat=material(0xf07858,.4,.1,0x802b18);
+ const buildings=new THREE.InstancedMesh(unitBox,buildingMat,225);
+ const roofs=new THREE.InstancedMesh(unitBox,roofMat,225);
+ const windows=new THREE.InstancedMesh(unitBox,windowsMat,1800);
+ const badges=new THREE.InstancedMesh(unitBox,badgeMat,225);
+ const dummy=new THREE.Object3D(),tint=new THREE.Color();
+ let buildingCount=0,roofCount=0,windowCount=0,badgeCount=0;
  occupied.clear();
  for(let x=-7;x<=7;x++)for(let z=-7;z<=7;z++){
   if(Math.abs(x)<=2&&Math.abs(z)<=2)continue;
@@ -71,17 +82,29 @@ function buildCity(){
   occupied.add(key(x,z));
   const h=1.0+hval*3.2,w=.56+deterministic(z,x)*.25,d=.56+deterministic(x+5,z-4)*.25;
   const hot=deterministic(x-11,z+6)>.4;
-  const body=hot?material(0x673c36,.82,.08,0x32100a):concrete;
-  addBox(world,x,.015,z,w,h,d,body);
-  if(h>.34)addBox(world,x,.04,z,w*.83,Math.min(h*.28,.75),d*.86,shadow).position.y=.1;
-  if(hot&&hval>.68){const badge=new THREE.Mesh(new THREE.BoxGeometry(w*.62,.025,d*.62),material(0xf07858,.4,.1,0x802b18));badge.position.set(x,h+.045,z);world.add(badge);}
-  if(deterministic(x+z,z-x)>.7){for(let y=.35;y<h-.2;y+=.45)addBox(world,x,y,z+d*.505,.13,.09,.03,windows);}
+  dummy.position.set(x,.015+h/2,z);dummy.scale.set(w,h,d);dummy.updateMatrix();
+  buildings.setMatrixAt(buildingCount,dummy.matrix);buildings.setColorAt(buildingCount,tint.setHex(hot?0x673c36:0x394550));buildingCount++;
+  if(h>.34){
+   dummy.position.set(x,h+.035,z);dummy.scale.set(w*.83,.04,d*.86);dummy.updateMatrix();roofs.setMatrixAt(roofCount++,dummy.matrix);
+  }
+  if(hot&&hval>.68){
+   dummy.position.set(x,h+.045,z);dummy.scale.set(w*.62,.025,d*.62);dummy.updateMatrix();badges.setMatrixAt(badgeCount++,dummy.matrix);
+  }
+  if(deterministic(x+z,z-x)>.7){
+   for(let y=.35;y<h-.2;y+=.45){
+    dummy.position.set(x,y+.045,z+d*.505);dummy.scale.set(.13,.09,.03);dummy.updateMatrix();windows.setMatrixAt(windowCount++,dummy.matrix);
+   }
+  }
  }
+ buildings.count=buildingCount;roofs.count=roofCount;windows.count=windowCount;badges.count=badgeCount;
+ [buildings,roofs,windows,badges].forEach(mesh=>{
+  if(mesh.count>0){mesh.instanceMatrix.needsUpdate=true;if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;mesh.computeBoundingSphere();world.add(mesh);}
+ });
  hotGroup=new THREE.Group();world.add(hotGroup);hotRings=[];
- HOT.forEach((p,i)=>{
-  const ring=new THREE.Mesh(new THREE.TorusGeometry(.68,.045,8,40),new THREE.MeshBasicMaterial({color:0xff805e,transparent:true,opacity:.95}));
+ HOT.forEach((p)=>{
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(.68,.045,6,24),new THREE.MeshBasicMaterial({color:0xff805e,transparent:true,opacity:.95}));
   ring.rotation.x=-Math.PI/2;ring.position.set(p.x,.09,p.z);hotGroup.add(ring);
-  const dot=new THREE.Mesh(new THREE.SphereGeometry(.13,14,10),new THREE.MeshBasicMaterial({color:0xffc19f}));
+  const dot=new THREE.Mesh(new THREE.SphereGeometry(.13,10,8),new THREE.MeshBasicMaterial({color:0xffc19f}));
   dot.position.set(p.x,.18,p.z);hotGroup.add(dot);hotRings.push(ring);
  });
  moduleGroup=new THREE.Group();world.add(moduleGroup);raycaster=new THREE.Raycaster();pointer=new THREE.Vector2();
