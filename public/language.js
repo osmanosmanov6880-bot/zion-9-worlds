@@ -183,8 +183,6 @@
     "World prototypes": "Прототипы миров",
     "World archive": "Архив миров",
     "World archive / 10 transmissions": "Архив миров / 10 сигналов",
-    "LANGUAGE": "ЯЗЫК",
-    "ЯЗЫК": "LANGUAGE",
     "Every signal": "Каждый сигнал",
     "opens a world.": "открывает мир.",
     "Signal decoded": "Сигнал расшифрован",
