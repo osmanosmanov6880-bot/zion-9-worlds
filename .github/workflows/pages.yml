@@ -51,7 +51,9 @@ jobs:
           cat /tmp/zion-static-server.log
           exit 1
       - name: Browser smoke tests — desktop, mobile, WebGL, RU/EN and win state
-        run: node tools/browser-smoke.mjs | tee /tmp/zion-browser-report.json
+        run: |
+          set -o pipefail
+          node tools/browser-smoke.mjs | tee /tmp/zion-browser-report.json
       - name: Publish browser proof
         if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
