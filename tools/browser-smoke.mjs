@@ -147,17 +147,23 @@ try {
   mobile.on("pageerror", error => errors.push(error.message));
   const mobileResponse = await mobile.goto(base + "/queue/ZION-030/index.html", { waitUntil: "domcontentloaded", timeout: 15000 });
   assert.equal(mobileResponse.status(), 200);
-  // Verify the responsive shell independently from WebGL support in mobile emulation.
-  // Full WebGL creation and gameplay are mandatory on the desktop Chromium context above.
+  await mobile.waitForFunction(
+    () => !!document.querySelector("#scene canvas") ||
+      /Three\\.js could not load/i.test(document.querySelector("#scene")?.textContent || ""),
+    undefined,
+    { timeout: 12000 }
+  );
   const layout = await mobile.evaluate(() => ({
     viewport: window.innerWidth,
     document: document.documentElement.scrollWidth,
     sceneShell: !!document.querySelector("#scene"),
     canvas: !!document.querySelector("#scene canvas"),
+    fallback: !document.querySelector("#scene canvas") && /Three\\.js could not load/i.test(document.querySelector("#scene")?.textContent || ""),
     canvasWidth: Math.round(document.querySelector("#scene canvas")?.getBoundingClientRect().width || 0)
   }));
   assert.ok(layout.sceneShell, "Mobile page must contain the 3D scene shell");
   assert.ok(layout.document <= layout.viewport + 1, `Unexpected mobile horizontal overflow: ${JSON.stringify(layout)}`);
+  assert.ok(layout.canvas || layout.fallback, "Mobile scene must render WebGL or a visible fallback");
   if (layout.canvas) assert.ok(layout.canvasWidth > 300, "3D canvas must fit the phone viewport");
 
   results.mobile = { http: mobileResponse.status(), ...layout };
