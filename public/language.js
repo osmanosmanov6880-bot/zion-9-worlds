@@ -441,6 +441,12 @@
     if (match) return "Сигнал удержан. Осталось: " + match[1] + ".";
     match = value.match(/^([A-Z]+), resonance (\d+)$/);
     if (match) return (translations[match[1]] || match[1]) + ", резонанс " + match[2];
+    match = value.match(/^NODES (\d+) \/ 3$/);
+    if (match) return "УЗЛЫ " + match[1] + " / 3";
+    match = value.match(/^(\d+) of 3 hotspots covered\. (\d+) modules remain\. Target glowing rings\.$/);
+    if (match) return match[1] + " из 3 горячих точек закрыто. Осталось модулей: " + match[2] + ". Цельтесь в светящиеся кольца.";
+    match = value.match(/^Signal stable\. (\d+) of 3 hotspots covered\.$/);
+    if (match) return "Сигнал стабилен. Закрыто горячих точек: " + match[1] + " из 3.";
     if (value === "EMBER") return "УГОЛЁК";
     if (value === "TIDE") return "ПРИЛИВ";
     if (value === "LENS") return "ЛИНЗА";
@@ -457,6 +463,12 @@
     if (match) return "Signal held. " + match[1] + " remain.";
     match = value.match(/^(.+), резонанс (\d+)$/);
     if (match) return ((english[match[1]] || match[1])) + ", resonance " + match[2];
+    match = value.match(/^УЗЛЫ (\d+) \/ 3$/);
+    if (match) return "NODES " + match[1] + " / 3";
+    match = value.match(/^(\d+) из 3 горячих точек закрыто\. Осталось модулей: (\d+)\. Цельтесь в светящиеся кольца\.$/);
+    if (match) return match[1] + " of 3 hotspots covered. " + match[2] + " modules remain. Target glowing rings.";
+    match = value.match(/^Сигнал стабилен\. Закрыто горячих точек: (\d+) из 3\.$/);
+    if (match) return "Signal stable. " + match[1] + " of 3 hotspots covered.";
     const reverseNames = {"УГОЛЁК":"EMBER","ПРИЛИВ":"TIDE","ЛИНЗА":"LENS","УКАЗАТЕЛЬ":"INDEX","ЧЕРНИЛА":"INK","ПОЛЕ":"MARGIN"};
     return reverseNames[value] || value;
   }
