@@ -118,7 +118,7 @@ try {
   logPhase("world-language-switch", worldLocale);
   assert.equal(worldLocale.clickObserved, true, "In-game language button click event must fire");
   assert.equal(worldLocale.lang, "ru", "In-game language click must set html lang to ru");
-  await world.locator("#sound").evaluate(button => button.click());
+  logPhase("world-language-switch-pass", worldLocale);
   const placements = await world.evaluate(() => {
     const api = window.__ZION9_TEST__;
     const spots = api.hotSpots();
