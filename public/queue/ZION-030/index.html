@@ -253,7 +253,17 @@ function showThreeFallback(){
 function startThreeGame(){
  if(!window.THREE){showThreeFallback();return;}
  if(renderer)return;
- buildCity();renderer.domElement.addEventListener("pointerdown",onPlace);setupAR();
+ try{
+  buildCity();
+  renderer.domElement.addEventListener("pointerdown",onPlace);
+  setupAR();
+ }catch(error){
+  // WebGL may be unavailable in constrained browsers. Keep the dossier and controls reachable.
+  try{renderer?.dispose();}catch(_){}
+  renderer=null;
+  showThreeFallback();
+  return;
+ }
  if(new URLSearchParams(location.search).has("test")){
   window.__ZION9_TEST__={
    placeAt:(x,z,type)=>{const ok=placeModuleAt(x,z,type);return {ok,placed:placed.length,score:HOT.filter(p=>placed.some(m=>Math.hypot(m.x-p.x,m.z-p.z)<=1.35)).length,won,lost};},
