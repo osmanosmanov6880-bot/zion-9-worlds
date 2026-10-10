@@ -100,19 +100,20 @@ try {
 
   const dossier = await context.newPage();
   dossier.on("pageerror", error => errors.push(error.message));
-  const dossierResponse = await dossier.goto(base + "/episodes/ZION-030.html", { waitUntil: "networkidle", timeout: 45000 });
+  const dossierResponse = await dossier.goto(base + "/episodes/ZION-030.html", { waitUntil: "domcontentloaded", timeout: 30000 });
   assert.equal(dossierResponse.status(), 200, "Episode dossier must respond with HTTP 200");
   await dossier.locator(".z9-language-btn[data-language='ru']").click();
   await dossier.waitForFunction(() => document.documentElement.lang === "ru");
   const dossierHeading = (await dossier.locator(".hero h1").innerText()).replace(/\s+/g, " ").trim();
   assert.match(dossierHeading, /ТЕНЕВОЙ ПРОТОКОЛ/i, "Dossier H1 should be translated even when split across markup: " + dossierHeading);
-  await dossier.screenshot({ path: "test-results/dossier-ru.png", fullPage: true });
+  await dossier.screenshot({ path: "test-results/dossier-ru.png", fullPage: false });
   results.dossier = { http: dossierResponse.status(), localeToggle: true, heading: dossierHeading };
 
   const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true });
   mobile.on("pageerror", error => errors.push(error.message));
-  const mobileResponse = await mobile.goto(base + "/queue/ZION-030/index.html", { waitUntil: "networkidle", timeout: 45000 });
+  const mobileResponse = await mobile.goto(base + "/queue/ZION-030/index.html", { waitUntil: "domcontentloaded", timeout: 30000 });
   assert.equal(mobileResponse.status(), 200);
+  await mobile.waitForFunction(() => !!document.querySelector("#scene canvas"), undefined, { timeout: 30000 });
   const layout = await mobile.evaluate(() => ({
     viewport: window.innerWidth,
     document: document.documentElement.scrollWidth,
