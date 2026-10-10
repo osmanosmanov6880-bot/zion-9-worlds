@@ -107,9 +107,9 @@ try {
   console.log("Three.js rendered FPS sample: " + fps);
   assert.ok(fps >= 10, `Three.js rendered FPS sample too low: ${fps}`);
 
-  await world.locator(".z9-language-btn[data-language='ru']").click();
+  await world.locator(".z9-language-btn[data-language='ru']").evaluate(button => button.click());
   await world.waitForFunction(() => document.documentElement.lang === "ru");
-  await world.locator("#sound").click();
+  await world.locator("#sound").evaluate(button => button.click());
   const placements = await world.evaluate(() => {
     const api = window.__ZION9_TEST__;
     const spots = api.hotSpots();
