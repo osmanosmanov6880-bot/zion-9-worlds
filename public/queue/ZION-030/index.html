@@ -177,7 +177,7 @@ function reset(){
 function playMotif(){
  try{
   const AC=window.AudioContext||window.webkitAudioContext;if(!AC){say("Audio unavailable","This browser does not support Web Audio.");return;}
-  if(!audioContext)audioContext=new AC();if(audioContext.state==="suspended")audioContext.resume();
+  if(!audioContext)audioContext=new AC();if(audioContext.state==="suspended")audioContext.resume().catch(()=>{});
   const now=audioContext.currentTime,[c,g,e]=[261.63,392.00,329.63];
   [c,g,e].forEach((f,i)=>{const osc=audioContext.createOscillator(),gain=audioContext.createGain();osc.type="sine";osc.frequency.value=f;gain.gain.setValueAtTime(.0001,now+i*.22);gain.gain.exponentialRampToValueAtTime(.12,now+i*.22+.035);gain.gain.exponentialRampToValueAtTime(.0001,now+i*.22+.19);osc.connect(gain);gain.connect(audioContext.destination);osc.start(now+i*.22);osc.stop(now+i*.22+.2);});
  }catch(err){say("Audio unavailable","Allow browser audio and try again.");}
