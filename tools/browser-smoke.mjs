@@ -109,7 +109,7 @@ try {
   await dossier.screenshot({ path: "test-results/dossier-ru.png", fullPage: false });
   results.dossier = { http: dossierResponse.status(), localeToggle: true, heading: dossierHeading };
 
-  const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true });
+  const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: false, hasTouch: true });
   mobile.on("pageerror", error => errors.push(error.message));
   const mobileResponse = await mobile.goto(base + "/queue/ZION-030/index.html", { waitUntil: "domcontentloaded", timeout: 30000 });
   assert.equal(mobileResponse.status(), 200);
