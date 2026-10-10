@@ -166,6 +166,38 @@
     "The sequence has reset. Try again, lowest to highest.": "Последовательность сброшена. Попробуйте снова — от слабого резонанса к сильному.",
     "Transmission index ↗": "Архив сигналов ↗"
   };
+  Object.assign(translations, {
+    "BASALT LULLABY": "БАЗАЛЬТОВАЯ КОЛЫБЕЛЬ",
+    "THE SILENT ARCHIVE": "ТИХИЙ АРХИВ",
+    "GLASS ORCHARD": "СТЕКЛЯННЫЙ САД",
+    "THE LAST TIDE ENGINE": "ПОСЛЕДНИЙ ПРИЛИВНЫЙ МЕХАНИЗМ",
+    "VELVET FREQUENCY": "БАРХАТНАЯ ЧАСТОТА",
+    "THE PALE EQUATION": "БЛЕДНОЕ УРАВНЕНИЕ",
+    "NORTH OF SLEEP": "СЕВЕР СНА",
+    "THE BRONZE HOUR": "БРОНЗОВЫЙ ЧАС",
+    "MIRROR WEATHER": "ЗЕРКАЛЬНАЯ ПОГОДА",
+    "THE BLUE INTERVAL": "СИНИЙ ИНТЕРВАЛ",
+    "ZION-9 / INFINITE WORLDS": "ZION-9 / БЕСКОНЕЧНЫЕ МИРЫ",
+    "Prototype • ZION-020": "Прототип • ZION-020",
+    "Prototype • ZION-021": "Прототип • ZION-021",
+    "Interactive transmission": "Интерактивный сигнал",
+    "Signal study": "Исследование сигнала",
+    "Public story build": "Публичная версия истории",
+    "Draft build": "Черновая версия",
+    "STATIC BUILD": "СТАТИЧЕСКАЯ СБОРКА",
+    "No trackers · no external scripts ·": "Без трекеров · без внешних скриптов ·",
+    "Some worlds open when you notice what is already there.": "Некоторые миры открываются, когда замечаешь то, что уже рядом.",
+    "Signal held.": "Сигнал удержан.",
+    "WORLD ARCHIVE": "АРХИВ МИРОВ",
+    "ALL WORLDS": "ВСЕ МИРЫ",
+    "MAIN ARCHIVE": "ГЛАВНЫЙ АРХИВ",
+    "Resonance 11": "Резонанс 11",
+    "Resonance 18": "Резонанс 18",
+    "Resonance 27": "Резонанс 27",
+    "Resonance 42": "Резонанс 42",
+    "Resonance 58": "Резонанс 58",
+    "Resonance 73": "Резонанс 73"
+  });
   const english = Object.fromEntries(Object.entries(translations).map(([en, ru]) => [ru, en]));
   function getLanguage() {
     try {
