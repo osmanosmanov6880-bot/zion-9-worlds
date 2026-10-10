@@ -75,9 +75,11 @@ try {
     const renderedFrames = window.__ZION9_TEST__.state().frameCounter - startFrames;
     return Math.round(renderedFrames * 1000 / elapsed);
   });
+  console.log("Three.js rendered FPS sample: " + fps);
   assert.ok(fps >= 10, `Three.js rendered FPS sample too low: ${fps}`);
   await world.locator(".z9-language-btn[data-language='ru']").click();
   await world.waitForFunction(() => document.documentElement.lang === "ru");
+  await world.locator("#sound").click();
   const placements = await world.evaluate(() => {
     const api = window.__ZION9_TEST__;
     const spots = api.hotSpots();
@@ -101,9 +103,11 @@ try {
   const dossierResponse = await dossier.goto(base + "/episodes/ZION-030.html", { waitUntil: "networkidle", timeout: 45000 });
   assert.equal(dossierResponse.status(), 200, "Episode dossier must respond with HTTP 200");
   await dossier.locator(".z9-language-btn[data-language='ru']").click();
-  await dossier.getByText("ТЕНЕВОЙ ПРОТОКОЛ", { exact: true }).first().waitFor();
+  await dossier.waitForFunction(() => document.documentElement.lang === "ru");
+  const dossierHeading = (await dossier.locator(".hero h1").innerText()).replace(/\\s+/g, " ").trim();
+  assert.match(dossierHeading, /ТЕНЕВОЙ\\s+ПРОТОКОЛ/i, "Dossier H1 should be translated even when split across markup: " + dossierHeading);
   await dossier.screenshot({ path: "test-results/dossier-ru.png", fullPage: true });
-  results.dossier = { http: dossierResponse.status(), localeToggle: true };
+  results.dossier = { http: dossierResponse.status(), localeToggle: true, heading: dossierHeading };
 
   const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true });
   mobile.on("pageerror", error => errors.push(error.message));
