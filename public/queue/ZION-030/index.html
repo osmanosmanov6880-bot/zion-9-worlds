@@ -119,18 +119,24 @@ function setModule(type){
  say("Module selected",text[type]);
 }
 moduleButtons.forEach(b=>b.addEventListener("click",()=>setModule(b.dataset.type)));
-function onPlace(event){
- if(!renderer||won||lost||placed.length>=3)return;
- const rect=renderer.domElement.getBoundingClientRect();pointer.x=((event.clientX-rect.left)/rect.width)*2-1;pointer.y=-((event.clientY-rect.top)/rect.height)*2+1;
- raycaster.setFromCamera(pointer,camera);const hits=raycaster.intersectObject(floor,false);if(!hits.length)return;
- const x=Math.max(-7,Math.min(7,Math.round(hits[0].point.x))),z=Math.max(-7,Math.min(7,Math.round(hits[0].point.z))),k=key(x,z);
- if(occupied.has(k)||placed.some(p=>p.key===k)){say("Tile unavailable","Choose an empty tile. Buildings and existing interventions cannot be replaced.");return;}
- occupied.add(k);const module=makeModule(selected,x,z);moduleGroup.add(module);placed.push({x,z,key:k,type:selected});
+function placeModuleAt(x,z,type){
+ if(!renderer||won||lost||placed.length>=3)return false;
+ x=Math.max(-7,Math.min(7,Math.round(x)));z=Math.max(-7,Math.min(7,Math.round(z)));
+ const k=key(x,z);
+ if(occupied.has(k)||placed.some(p=>p.key===k)){say("Tile unavailable","Choose an empty tile. Buildings and existing interventions cannot be replaced.");return false;}
+ occupied.add(k);const module=makeModule(type||selected,x,z);moduleGroup.add(module);placed.push({x,z,key:k,type:type||selected});
  const covered=HOT.map(p=>placed.some(m=>Math.hypot(m.x-p.x,m.z-p.z)<=1.35));
  const score=covered.filter(Boolean).length;updateUI(covered);
  if(score===3){won=true;say("Mission complete","All three heat hotspots are covered. You built a cooler shared space. Play the C–G–E signature or open the source dossier.");playMotif();}
  else if(placed.length===3){lost=true;say("Thermal pressure remains","Three modules used, but one or more hotspots remain exposed. Reset and try a tighter placement.");}
  else say("Intervention placed",score+" of 3 hotspots covered. "+(3-placed.length)+" modules remain. Target glowing rings.");
+ return true;
+}
+function onPlace(event){
+ if(!renderer||won||lost||placed.length>=3)return;
+ const rect=renderer.domElement.getBoundingClientRect();pointer.x=((event.clientX-rect.left)/rect.width)*2-1;pointer.y=-((event.clientY-rect.top)/rect.height)*2+1;
+ raycaster.setFromCamera(pointer,camera);const hits=raycaster.intersectObject(floor,false);if(!hits.length)return;
+ placeModuleAt(hits[0].point.x,hits[0].point.z,selected);
 }
 function updateUI(covered){
  const score=covered.filter(Boolean).length;
@@ -180,7 +186,16 @@ async function setupAR(){
 document.getElementById("sound").addEventListener("click",playMotif);
 document.getElementById("reset").addEventListener("click",reset);
 document.getElementById("report").addEventListener("click",()=>location.href="../../episodes/ZION-030.html");
-if(window.THREE){buildCity();renderer.domElement.addEventListener("pointerdown",onPlace);setupAR();}
+if(window.THREE){buildCity();renderer.domElement.addEventListener("pointerdown",onPlace);setupAR();
+ if(new URLSearchParams(location.search).has("test")){
+  window.__ZION9_TEST__={
+   placeAt:(x,z,type)=>{const ok=placeModuleAt(x,z,type);return {ok,placed:placed.length,score:HOT.filter(p=>placed.some(m=>Math.hypot(m.x-p.x,m.z-p.z)<=1.35)).length,won,lost};},
+   reset:()=>{reset();return {placed:placed.length,won,lost};},
+   state:()=>({placed:placed.length,won,lost,score:HOT.filter(p=>placed.some(m=>Math.hypot(m.x-p.x,m.z-p.z)<=1.35)).length,rendererCalls:renderer.info.render.calls,webgl:!!renderer.getContext()}),
+   hotSpots:()=>HOT.map(p=>({x:p.x,z:p.z}))
+  };
+ }
+}
 else{root.innerHTML="<div style='padding:35px;color:#e9f7ff'>Three.js could not load. Check the network connection and refresh to load the 3D city.</div>";say("3D engine unavailable","The Three.js CDN did not load. The field report remains available below.");}
 })();
 </script><script src="../../language.js"></script>
