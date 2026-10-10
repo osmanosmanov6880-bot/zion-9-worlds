@@ -11,16 +11,6 @@ function logPhase(name, data = {}) {
   console.log(JSON.stringify({ phase: name, at: new Date().toISOString(), ...data }));
 }
 
-async function tryScreenshot(page, path) {
-  try {
-    await page.screenshot({ path, fullPage: false, timeout: 5000, animations: "disabled" });
-    return true;
-  } catch (error) {
-    logPhase("screenshot-skipped", { path, reason: String(error).slice(0, 180) });
-    return false;
-  }
-}
-
 const browser = await chromium.launch({
   headless: true,
   timeout: 20000,
@@ -61,12 +51,11 @@ try {
   }
   const structured = await context.request.get(base + "/episodes/ZION-030.json", { timeout: 8000 });
   assert.equal(structured.status(), 200, "Structured episode data must be public");
-  await tryScreenshot(page, "test-results/home-en.png");
 
   await page.locator(".z9-language-btn[data-language='ru']").click();
   await page.waitForFunction(() => document.documentElement.lang === "ru");
   assert.match((await page.locator(".featured-episode").innerText()).replace(/\s+/g, " "), /ТЕНЕВОЙ ПРОТОКОЛ/i);
-  await tryScreenshot(page, "test-results/home-ru.png");
+
   await page.locator(".z9-language-btn[data-language='en']").click();
   await page.waitForFunction(() => document.documentElement.lang === "en");
   results.home = { http: home.status(), localeToggle: "EN<->RU", publicWorldRoutes: worldRoutes, episodeJsonHttp: structured.status() };
@@ -132,7 +121,7 @@ try {
   assert.equal(placements.state.score, 3, "All three hotspots must be covered");
   assert.equal(placements.state.won, true, "Game must reach the win state");
   await world.waitForFunction(() => document.querySelector("#statusTitle").textContent === "Миссия выполнена");
-  await tryScreenshot(world, "test-results/zion-030-victory-ru.png");
+
   const reset = await world.evaluate(() => window.__ZION9_TEST__.reset());
   assert.deepEqual(reset, { placed: 0, won: false, lost: false });
   results.world = { http: worldResponse.status(), threeRender: true, webglContextCreated: true, drawCalls: renderer.calls, fpsSample: fps, allHotspotsCovered: true, winState: true, russianWinMessage: true, reset: true };
@@ -148,7 +137,7 @@ try {
   await dossier.waitForFunction(() => document.documentElement.lang === "ru");
   const dossierHeading = (await dossier.locator(".hero h1").innerText()).replace(/\s+/g, " ").trim();
   assert.equal(dossierHeading, "ТЕНЕВОЙ ПРОТОКОЛ", "Dossier heading should be translated: " + dossierHeading);
-  await tryScreenshot(dossier, "test-results/dossier-ru.png");
+
   results.dossier = { http: dossierResponse.status(), localeToggle: true, heading: dossierHeading };
   logPhase("dossier-translation-pass");
 
@@ -170,7 +159,7 @@ try {
   assert.ok(layout.sceneShell, "Mobile page must contain the 3D scene shell");
   assert.ok(layout.document <= layout.viewport + 1, `Unexpected mobile horizontal overflow: ${JSON.stringify(layout)}`);
   if (layout.canvas) assert.ok(layout.canvasWidth > 300, "3D canvas must fit the phone viewport");
-  await tryScreenshot(mobile, "test-results/world-mobile.png");
+
   results.mobile = { http: mobileResponse.status(), ...layout };
   logPhase("mobile-layout-pass", layout);
 
