@@ -42,7 +42,7 @@ const root=document.getElementById("scene"), statusTitle=document.getElementById
 const placedPill=document.getElementById("placedPill"),scoreEl=document.getElementById("score"),leftEl=document.getElementById("left"),meter=[...document.querySelectorAll("#meter i")];
 const moduleButtons=[...document.querySelectorAll(".module")],arButton=document.getElementById("ar");
 const HOT=[{x:-4,z:-3},{x:2,z:2},{x:4,z:-2}];
-const GRID=7;let selected="tree",placed=[],won=false,lost=false,renderer,scene,camera,world,moduleGroup,hotGroup,floor,raycaster,pointer,resizeObserver,audioContext,normalBackground;
+const GRID=7;let selected="tree",placed=[],won=false,lost=false,renderer,scene,camera,world,moduleGroup,hotGroup,floor,raycaster,pointer,resizeObserver,audioContext,normalBackground,frameCounter=0;
 const occupied=new Set();let hotRings=[];
 const say=(title,text)=>{statusTitle.textContent=title;statusText.textContent=text;};
 function deterministic(x,z){let n=Math.sin(x*127.1+z*311.7+74.7)*43758.5453;return n-Math.floor(n);}
@@ -184,7 +184,7 @@ function playMotif(){
 }
 function resize(){if(!renderer||!camera)return;const w=Math.max(1,root.clientWidth),h=Math.max(1,root.clientHeight);renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
 function animate(time){
- if(!renderer)return;const t=time*.001;
+ if(!renderer)return;frameCounter++;const t=time*.001;
  hotRings.forEach((r,i)=>{r.scale.setScalar(1+Math.sin(t*2+i)*.055);});
  if(!renderer.xr.isPresenting){camera.position.x=11+Math.sin(t*.12)*.35;camera.lookAt(0,0,0);}
  renderer.render(scene,camera);
@@ -214,7 +214,7 @@ if(window.THREE){buildCity();renderer.domElement.addEventListener("pointerdown",
   window.__ZION9_TEST__={
    placeAt:(x,z,type)=>{const ok=placeModuleAt(x,z,type);return {ok,placed:placed.length,score:HOT.filter(p=>placed.some(m=>Math.hypot(m.x-p.x,m.z-p.z)<=1.35)).length,won,lost};},
    reset:()=>{reset();return {placed:placed.length,won,lost};},
-   state:()=>({placed:placed.length,won,lost,score:HOT.filter(p=>placed.some(m=>Math.hypot(m.x-p.x,m.z-p.z)<=1.35)).length,rendererCalls:renderer.info.render.calls,webgl:!!renderer.getContext()}),
+   state:()=>({placed:placed.length,won,lost,score:HOT.filter(p=>placed.some(m=>Math.hypot(m.x-p.x,m.z-p.z)<=1.35)).length,rendererCalls:renderer.info.render.calls,frameCounter,webgl:!!renderer.getContext()}),
    hotSpots:()=>HOT.map(p=>({x:p.x,z:p.z}))
   };
  }
