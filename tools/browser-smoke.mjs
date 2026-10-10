@@ -41,12 +41,12 @@ try {
   }
   const structured = await context.request.get(base + "/episodes/ZION-030.json");
   assert.equal(structured.status(), 200, "Structured episode data must be public");
-  await page.screenshot({ path: "test-results/home-en.png", fullPage: true });
+  await page.screenshot({ path: "test-results/home-en.png", fullPage: false });
 
   await page.locator(".z9-language-btn[data-language='ru']").click();
   await page.getByText("ТЕНЕВОЙ ПРОТОКОЛ", { exact: true }).first().waitFor();
   assert.equal(await page.locator("html").getAttribute("lang"), "ru");
-  await page.screenshot({ path: "test-results/home-ru.png", fullPage: true });
+  await page.screenshot({ path: "test-results/home-ru.png", fullPage: false });
   await page.locator(".z9-language-btn[data-language='en']").click();
   await page.getByText("THE SHADE PROTOCOL", { exact: true }).first().waitFor();
   results.home = { http: home.status(), localeToggle: "EN<->RU", publicWorldRoutes: worldRoutes, episodeJsonHttp: structured.status(), screenshots: 2 };
@@ -55,7 +55,7 @@ try {
   world.on("pageerror", error => errors.push(error.message));
   const worldResponse = await world.goto(base + "/queue/ZION-030/index.html?test=1", { waitUntil: "networkidle", timeout: 45000 });
   assert.equal(worldResponse.status(), 200, "3D world must respond with HTTP 200");
-  await world.waitForFunction(() => window.__ZION9_TEST__ && document.querySelector("#scene canvas"), undefined, { timeout: 30000 });
+  await world.waitForFunction(() => window.__ZION9_TEST__ && document.querySelector("#scene canvas"), undefined, { timeout: 15000 });
   await world.waitForTimeout(900);
   const renderer = await world.evaluate(() => ({
     context: !!document.querySelector("#scene canvas")?.getContext("webgl2"),
@@ -93,7 +93,7 @@ try {
   assert.equal(placements.state.score, 3, "All three hotspots must be covered");
   assert.equal(placements.state.won, true, "Game must reach the win state");
   await world.waitForFunction(() => document.querySelector("#statusTitle").textContent === "Миссия выполнена");
-  await world.screenshot({ path: "test-results/zion-030-victory-ru.png", fullPage: true });
+  await world.screenshot({ path: "test-results/zion-030-victory-ru.png", fullPage: false });
   const reset = await world.evaluate(() => window.__ZION9_TEST__.reset());
   assert.deepEqual(reset, { placed: 0, won: false, lost: false });
   results.world = { http: worldResponse.status(), threeRender: true, webglContextCreated: true, drawCalls: renderer.calls, fpsSample: fps, allHotspotsCovered: true, winState: true, russianWinMessage: true, reset: true };
@@ -113,7 +113,7 @@ try {
   mobile.on("pageerror", error => errors.push(error.message));
   const mobileResponse = await mobile.goto(base + "/queue/ZION-030/index.html", { waitUntil: "domcontentloaded", timeout: 30000 });
   assert.equal(mobileResponse.status(), 200);
-  await mobile.waitForFunction(() => !!document.querySelector("#scene canvas"), undefined, { timeout: 30000 });
+  await mobile.waitForFunction(() => !!document.querySelector("#scene canvas"), undefined, { timeout: 12000 });
   const layout = await mobile.evaluate(() => ({
     viewport: window.innerWidth,
     document: document.documentElement.scrollWidth,
@@ -122,7 +122,7 @@ try {
   }));
   assert.ok(layout.document <= layout.viewport + 1, `Unexpected mobile horizontal overflow: ${JSON.stringify(layout)}`);
   assert.ok(layout.canvas && layout.canvasWidth > 300, "3D canvas must fit the phone viewport");
-  await mobile.screenshot({ path: "test-results/world-mobile.png", fullPage: true });
+  await mobile.screenshot({ path: "test-results/world-mobile.png", fullPage: false });
   results.mobile = { http: mobileResponse.status(), ...layout };
 
   assert.deepEqual(errors, [], "Unexpected JavaScript page errors");
