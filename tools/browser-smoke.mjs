@@ -13,7 +13,12 @@ const browser = await chromium.launch({
     "--use-angle=swiftshader",
     "--enable-unsafe-swiftshader",
     "--ignore-gpu-blocklist",
-    "--use-gl=angle"
+    "--use-gl=angle",
+    "--disable-frame-rate-limit",
+    "--disable-gpu-vsync",
+    "--disable-background-timer-throttling",
+    "--disable-renderer-backgrounding",
+    "--disable-backgrounding-occluded-windows"
   ]
 });
 
@@ -61,17 +66,16 @@ try {
   assert.equal(renderer.webgl, true, "Three.js renderer must exist");
   assert.ok(renderer.calls > 0, "Three.js must render draw calls");
 
-  const fps = await world.evaluate(() => new Promise(resolve => {
-    let frames = 0;
+  await world.bringToFront();
+  const fps = await world.evaluate(async () => {
     const start = performance.now();
-    function tick(now) {
-      frames++;
-      if (now - start >= 1000) resolve(Math.round(frames * 1000 / (now - start)));
-      else requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
-  }));
-  assert.ok(fps >= 10, `FPS smoke sample too low: ${fps}`);
+    const startFrames = window.__ZION9_TEST__.state().frameCounter;
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    const elapsed = performance.now() - start;
+    const renderedFrames = window.__ZION9_TEST__.state().frameCounter - startFrames;
+    return Math.round(renderedFrames * 1000 / elapsed);
+  });
+  assert.ok(fps >= 10, `Three.js rendered FPS sample too low: ${fps}`);
   await world.locator(".z9-language-btn[data-language='ru']").click();
   await world.waitForFunction(() => document.documentElement.lang === "ru");
   const placements = await world.evaluate(() => {
