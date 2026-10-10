@@ -53,20 +53,20 @@ function buildCity(){
  scene=new THREE.Scene();scene.background=new THREE.Color(0x080d16);normalBackground=scene.background;scene.fog=new THREE.Fog(0x080d16,18,34);
  camera=new THREE.PerspectiveCamera(42,1,.1,100);camera.position.set(11,14,17);camera.lookAt(0,0,0);
  renderer=new THREE.WebGLRenderer({antialias:false,alpha:true,powerPreference:"high-performance"});
- renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.35));renderer.setSize(root.clientWidth,root.clientHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.08;root.appendChild(renderer.domElement);
+ renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.0));renderer.setSize(root.clientWidth,root.clientHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.NoToneMapping;renderer.toneMappingExposure=1;root.appendChild(renderer.domElement);
  scene.add(new THREE.HemisphereLight(0xb6e7ff,0x171723,1.8));
  const keyLight=new THREE.DirectionalLight(0xffd4a4,2.6);keyLight.position.set(-7,13,8);scene.add(keyLight);
  const rim=new THREE.PointLight(0x2e9ed0,12,24);rim.position.set(8,6,-7);scene.add(rim);
  world=new THREE.Group();scene.add(world);
- const groundMat=material(0x101a26,.95);floor=new THREE.Mesh(new THREE.PlaneGeometry(16,16),groundMat);floor.rotation.x=-Math.PI/2;floor.position.y=-.04;floor.userData.ground=true;world.add(floor);
+ const groundMat=new THREE.MeshBasicMaterial({color:0x101a26});floor=new THREE.Mesh(new THREE.PlaneGeometry(16,16),groundMat);floor.rotation.x=-Math.PI/2;floor.position.y=-.04;floor.userData.ground=true;world.add(floor);
  const grid=new THREE.GridHelper(16,16,0x375066,0x263546);grid.position.y=.01;world.add(grid);
- const plaza=material(0x1a2935,.9);addBox(world,0,.01,0,5,.035,5,plaza);
+ const plaza=new THREE.MeshBasicMaterial({color:0x1a2935});addBox(world,0,.01,0,5,.035,5,plaza);
  // Reuse a handful of instanced draw calls instead of allocating hundreds of separate meshes.
  const unitBox=new THREE.BoxGeometry(1,1,1);
- const buildingMat=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.84,metalness:.035});
- const roofMat=material(0x202c38,.9);
- const windowsMat=material(0x122c3d,.4,.45,0x082030);
- const badgeMat=material(0xf07858,.4,.1,0x802b18);
+ const buildingMat=new THREE.MeshBasicMaterial({color:0xffffff});
+ const roofMat=new THREE.MeshBasicMaterial({color:0x202c38});
+ const windowsMat=new THREE.MeshBasicMaterial({color:0x174158});
+ const badgeMat=new THREE.MeshBasicMaterial({color:0xf07858});
  const buildings=new THREE.InstancedMesh(unitBox,buildingMat,225);
  const roofs=new THREE.InstancedMesh(unitBox,roofMat,225);
  const windows=new THREE.InstancedMesh(unitBox,windowsMat,1800);
