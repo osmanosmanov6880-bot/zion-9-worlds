@@ -34,7 +34,44 @@ main{width:min(1240px,100%);margin:auto;padding:22px clamp(14px,3vw,32px) 44px}h
 <section class="below"><article class="info"><h2>Field evidence · not game scoring</h2><p>A 2025 Athens field report described surface readings around 60°C on exposed paving and 30°C under tree shade at Argentinis Dimokratias Square. The 3D puzzle uses that finding as context; its points are illustrative, not scientific predictions.</p></article><article class="info"><h2>Technology already in use</h2><p>Athens combines shaded/green spaces with a Heat Risk Index and the <a href="https://coolathens.cityofathens.gr/en/" target="_blank" rel="noopener noreferrer">#CoolAthens</a> information service. Explore the <a href="../../episodes/ZION-030.html">full field episode, sources and business model ↗</a>.</p></article></section>
 <footer><span>Public interactive prototype · no account needed</span><a href="../../episodes/ZION-030.html">Episode dossier ↗</a><a href="../../operator_dashboard.html">Transmission index ↗</a></footer>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+(function(){
+  const sources=[
+    "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js",
+    "https://unpkg.com/three@0.160.0/build/three.min.js"
+  ];
+  let index=0;
+  function loadNext(){
+    if(index>=sources.length){window.dispatchEvent(new Event("zion-three-failed"));return;}
+    const script=document.createElement("script");
+    script.async=true;
+    script.src=sources[index++];
+    let settled=false;
+    const timer=window.setTimeout(function(){
+      if(settled)return;
+      settled=true;
+      script.remove();
+      loadNext();
+    },6500);
+    script.onload=function(){
+      if(settled)return;
+      settled=true;
+      window.clearTimeout(timer);
+      if(window.THREE)window.dispatchEvent(new Event("zion-three-ready"));
+      else loadNext();
+    };
+    script.onerror=function(){
+      if(settled)return;
+      settled=true;
+      window.clearTimeout(timer);
+      script.remove();
+      loadNext();
+    };
+    document.head.appendChild(script);
+  }
+  loadNext();
+})();
+</script>
 <script>
 (function(){
 "use strict";
@@ -209,7 +246,14 @@ async function setupAR(){
 document.getElementById("sound").addEventListener("click",playMotif);
 document.getElementById("reset").addEventListener("click",reset);
 document.getElementById("report").addEventListener("click",()=>location.href="../../episodes/ZION-030.html");
-if(window.THREE){buildCity();renderer.domElement.addEventListener("pointerdown",onPlace);setupAR();
+function showThreeFallback(){
+ root.innerHTML="<div style='padding:35px;color:#e9f7ff'>Three.js could not load from either CDN. Check the network and refresh to open the 3D city.</div>";
+ say("3D engine unavailable","Neither Three.js CDN responded. The field report remains available below.");
+}
+function startThreeGame(){
+ if(!window.THREE){showThreeFallback();return;}
+ if(renderer)return;
+ buildCity();renderer.domElement.addEventListener("pointerdown",onPlace);setupAR();
  if(new URLSearchParams(location.search).has("test")){
   window.__ZION9_TEST__={
    placeAt:(x,z,type)=>{const ok=placeModuleAt(x,z,type);return {ok,placed:placed.length,score:HOT.filter(p=>placed.some(m=>Math.hypot(m.x-p.x,m.z-p.z)<=1.35)).length,won,lost};},
@@ -219,7 +263,9 @@ if(window.THREE){buildCity();renderer.domElement.addEventListener("pointerdown",
   };
  }
 }
-else{root.innerHTML="<div style='padding:35px;color:#e9f7ff'>Three.js could not load. Check the network connection and refresh to load the 3D city.</div>";say("3D engine unavailable","The Three.js CDN did not load. The field report remains available below.");}
+window.addEventListener("zion-three-ready",startThreeGame,{once:true});
+window.addEventListener("zion-three-failed",showThreeFallback,{once:true});
+if(window.THREE)startThreeGame();
 })();
 </script><script src="../../language.js"></script>
 </body></html>

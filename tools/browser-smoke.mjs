@@ -53,9 +53,9 @@ try {
 
   const world = await context.newPage();
   world.on("pageerror", error => errors.push(error.message));
-  const worldResponse = await world.goto(base + "/queue/ZION-030/index.html?test=1", { waitUntil: "networkidle", timeout: 45000 });
+  const worldResponse = await world.goto(base + "/queue/ZION-030/index.html?test=1", { waitUntil: "domcontentloaded", timeout: 30000 });
   assert.equal(worldResponse.status(), 200, "3D world must respond with HTTP 200");
-  await world.waitForFunction(() => window.__ZION9_TEST__ && document.querySelector("#scene canvas"), undefined, { timeout: 15000 });
+  await world.waitForFunction(() => window.__ZION9_TEST__ && document.querySelector("#scene canvas"), undefined, { timeout: 20000 });
   await world.waitForTimeout(900);
   const renderer = await world.evaluate(() => ({
     context: !!document.querySelector("#scene canvas")?.getContext("webgl2"),
@@ -113,7 +113,7 @@ try {
   mobile.on("pageerror", error => errors.push(error.message));
   const mobileResponse = await mobile.goto(base + "/queue/ZION-030/index.html", { waitUntil: "domcontentloaded", timeout: 30000 });
   assert.equal(mobileResponse.status(), 200);
-  await mobile.waitForFunction(() => !!document.querySelector("#scene canvas"), undefined, { timeout: 12000 });
+  await mobile.waitForFunction(() => !!document.querySelector("#scene canvas"), undefined, { timeout: 20000 });
   const layout = await mobile.evaluate(() => ({
     viewport: window.innerWidth,
     document: document.documentElement.scrollWidth,
