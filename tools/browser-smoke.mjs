@@ -107,8 +107,17 @@ try {
   console.log("Three.js rendered FPS sample: " + fps);
   assert.ok(fps >= 10, `Three.js rendered FPS sample too low: ${fps}`);
 
-  await world.locator(".z9-language-btn[data-language='ru']").evaluate(button => button.click());
-  await world.waitForFunction(() => document.documentElement.lang === "ru");
+  const worldLocale = await world.evaluate(() => {
+    const button = document.querySelector(".z9-language-btn[data-language='ru']");
+    if (!button) throw new Error("In-game RU language button is missing");
+    let clickObserved = false;
+    button.addEventListener("click", () => { clickObserved = true; }, { once: true });
+    button.click();
+    return { lang: document.documentElement.lang, clickObserved, pressed: button.getAttribute("aria-pressed") };
+  });
+  logPhase("world-language-switch", worldLocale);
+  assert.equal(worldLocale.clickObserved, true, "In-game language button click event must fire");
+  assert.equal(worldLocale.lang, "ru", "In-game language click must set html lang to ru");
   await world.locator("#sound").evaluate(button => button.click());
   const placements = await world.evaluate(() => {
     const api = window.__ZION9_TEST__;
