@@ -1,0 +1,10 @@
+{
+  "product": "ZION-9 INFINITE",
+  "kind": "public-safe-static-export",
+  "world_count": 10,
+  "source_repo_visibility": "not exported",
+  "operator_credentials_exported": false,
+  "provider_status_exported": false,
+  "private_arg_answer_map_exported": false,
+  "external_scripts_required": false
+}
