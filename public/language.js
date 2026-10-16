@@ -467,6 +467,11 @@
     "Ready-to-post copy · no auto-publish": "Тексты готовы · автопубликации нет",
     "model assumptions · not existing sales": "расчётные допущения · не существующие продажи"
   });
+  Object.assign(translations, {
+    "information service. Explore the": "информационный сервис. Откройте",
+    "Procedurally generated 3D city block heat map. Select a cooling module and tap the ground to place it.": "Трёхмерная карта квартала с зонами нагрева. Выберите модуль охлаждения и нажмите на землю, чтобы разместить его.",
+    "Three interventions. Three heat hotspots. Turn a sun-baked city block into a cooler public place — one deliberate placement at a time.": "Три решения. Три горячие точки. Превратите раскалённый городской квартал в более прохладное общественное пространство — размещайте решения по одному."
+  });
   const english = Object.fromEntries(Object.entries(translations).map(([en, ru]) => [ru, en]));
   function getLanguage() {
     try {
