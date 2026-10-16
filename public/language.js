@@ -472,6 +472,21 @@
     "Procedurally generated 3D city block heat map. Select a cooling module and tap the ground to place it.": "Трёхмерная карта квартала с зонами нагрева. Выберите модуль охлаждения и нажмите на землю, чтобы разместить его.",
     "Three interventions. Three heat hotspots. Turn a sun-baked city block into a cooler public place — one deliberate placement at a time.": "Три решения. Три горячие точки. Превратите раскалённый городской квартал в более прохладное общественное пространство — размещайте решения по одному."
   });
+  Object.assign(translations, {
+    "ZION-9 / INFINITE WORLDS": "ZION-9 / БЕСКОНЕЧНЫЕ МИРЫ",
+    "World archive / 10 worlds + latest episode": "Архив миров / 10 миров + новый эпизод",
+    "Ten signals. Ten doors. One new field mission: use real evidence to redesign an overheated city block.": "Десять сигналов. Десять дверей. Новая полевая миссия: опираясь на реальные данные, измени перегретый городской квартал.",
+    "Latest episode": "Новый эпизод",
+    "NEW EPISODE · ZION-030 · ATHENS": "НОВЫЙ ЭПИЗОД · ZION-030 · АФИНЫ",
+    "THE SHADE PROTOCOL": "ТЕНЕВОЙ ПРОТОКОЛ",
+    "Can you cool a city block? Use three interventions — a tree, a shade canopy and a rain garden — to cover the heat hotspots. Based on real Athens field measurements and existing municipal technology.": "Сможешь охладить городской квартал? Размести три решения — дерево, теневой навес и дождевой сад — в самых жарких точках. Миссия основана на реальных замерах в Афинах и существующих городских технологиях.",
+    "PLAY THE 3D WORLD ↗": "ИГРАТЬ В 3D-МИР ↗",
+    "FIELD DOSSIER + SOURCES ↗": "ДОСЬЕ И ИСТОЧНИКИ ↗",
+    "Reported surface readings: exposed paving vs tree shade, Athens · 2025": "Замеры поверхности: открытое покрытие и тень деревьев, Афины · 2025",
+    "10 ARCHIVE WORLDS + 1 NEW MISSION": "10 МИРОВ В АРХИВЕ + 1 НОВАЯ МИССИЯ",
+    "ZION-9 INFINITE · STATIC BUILD": "ZION-9 БЕСКОНЕЧНЫЕ МИРЫ · СТАТИЧЕСКАЯ ВЕРСИЯ",
+    "No trackers · no external scripts ·": "Без трекеров · без внешних скриптов ·"
+  });
   const english = Object.fromEntries(Object.entries(translations).map(([en, ru]) => [ru, en]));
   function getLanguage() {
     try {
